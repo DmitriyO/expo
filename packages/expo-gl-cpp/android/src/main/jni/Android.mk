@@ -13,7 +13,7 @@ LOCAL_SRC_FILES := \
   ../../../../cpp/EXGLNativeMethods.cpp \
   EXGL.cpp
 
-LOCAL_CFLAGS := -fexceptions -frtti -g
+LOCAL_CFLAGS := -fexceptions -frtti -O3
 LOCAL_STATIC_LIBRARIES := libjsi
 LOCAL_SHARED_LIBRARIES := libfolly_json glog
 

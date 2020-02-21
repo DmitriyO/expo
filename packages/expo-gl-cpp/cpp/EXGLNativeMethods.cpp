@@ -1497,7 +1497,7 @@ NATIVE_METHOD(getActiveUniformBlockName) {
     GLuint program = lookupObject(fProgram);
     GLint bufSize;
     glGetActiveUniformBlockiv(program, uniformBlockIndex, GL_UNIFORM_BLOCK_NAME_LENGTH, &bufSize);
-    blockName.resize(bufsize > 0 ? bufSize - 1 : 0);
+    blockName.resize(bufSize > 0 ? bufSize - 1 : 0);
     glGetActiveUniformBlockName(program, uniformBlockIndex, bufSize, NULL, &blockName[0]);
   });
   return jsi::String::createFromUtf8(runtime, blockName);

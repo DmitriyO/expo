@@ -66,50 +66,26 @@ class EXGLContext {
   // [JS thread] Send the current 'next' batch to GL and make a new 'next' batch
   void endNextBatch() noexcept {
     std::lock_guard<std::mutex> lock(backlogMutex);
-    backlog.emplace_back();
-    backlog.back().reserve(16); // TODO add explanation for 16
-    backlog.back().swap(nextBatch);
+    backlog.push_back(std::move(nextBatch));
+    nextBatch = std::vector<Op>(); // TODO: might be unnecessary, move should leave object in valid state
+    nextBatch.reserve(16); // minimize number of relocations
   }
 
   // [JS thread] Add an Op to the 'next' batch -- the arguments are any form of
   // constructor arguments for Op
   void addToNextBatch(Op &&op) noexcept {
-    nextBatch.emplace_back(std::move(op));
+    nextBatch.push_back(std::move(op));
   }
 
   // [JS thread] Add a blocking operation to the 'next' batch -- waits for the
   // queued function to run before returning
-  inline void addBlockingToNextBatch(Op &&op) noexcept {
-#ifdef __ANDROID__
-    // std::packaged_task + std::future segfaults on Android... :|
-
-    std::mutex mutex;
-    std::condition_variable cv;
-    auto done = false;
-
-    addToNextBatch([&] {
-      op();
-      {
-        std::lock_guard<std::mutex> lock(mutex);
-        done = true;
-      }
-      cv.notify_all();
-    });
-
-    {
-      std::unique_lock<std::mutex> lock(mutex);
-      endNextBatch();
-      flushOnGLThread();
-      cv.wait(lock, [&] { return done; });
-    }
-#else
-    std::packaged_task<void(void)> task(std::move(f));
+  void addBlockingToNextBatch(Op &&op) noexcept {
+    std::packaged_task<void(void)> task(std::move(op));
     auto future = task.get_future();
     addToNextBatch([&] { task(); });
     endNextBatch();
     flushOnGLThread();
     future.wait();
-#endif
   }
 
   // [JS thread] Enqueue a function and return an EXGL object that will get mapped

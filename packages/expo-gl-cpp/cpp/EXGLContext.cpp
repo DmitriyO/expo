@@ -70,10 +70,8 @@ void EXGLContext::installMethods(
           return jsi::Value::null();                                               \
         }                                                                          \
         try {                                                                      \
-          EXGLSysLog("call %s", #name);                                            \
           return this->glNativeMethod_##name(runtime, jsThis, jsArgv, argc);       \
         } catch (const std::exception &e) {                                        \
-          EXGLSysLog("err %s", e.what());                                          \
           throw std::runtime_error(std::string("[" #name "] error: ") + e.what()); \
         }                                                                          \
       });
