@@ -41,6 +41,15 @@ Follow [Facebook's developer documentation](https://developers.facebook.com/docs
 
 You may have to switch the app from 'development mode' to 'public mode' on the Facebook developer page before other users can log in.
 
+- **Android standalone app with Google Play Signing**
+  - [Build your standalone app](../../distribution/building-standalone-apps/#building-standalone-apps) for Android.
+  - Go to Google Play console => Release Management => App signing => App signing certificate
+  - copy the SHA1 of the "App signing certificate" and encode in base64 format
+    from bash: echo "SHA-1 key" | xxd -r -p | openssl base64
+  - Copy the base64 value and paste it as an additional key hash in your Facebook developer page pictured above.
+  
+You may have to switch the app from 'development mode' to 'public mode' on the Facebook developer page before other users can log in.
+
 ## API
 
 ```js
